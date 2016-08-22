@@ -29,10 +29,10 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input){
 
 /*
   An example of how to use each of the functions implemented here:
-*/
   pass_through(cloud, pass_through_axis, pass_through_min_limit, pass_through_max_limit);
   voxel_grid(cloud, voxel_leaf_size);
   statistical_outlier_removal(cloud, sor_mean_k, sor_stdev_thresh);
+  */
 
 
   pcl::toROSMsg (*cloud, output);
