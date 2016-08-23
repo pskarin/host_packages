@@ -100,7 +100,7 @@ def completed_cb(data):
         goals.pop(element_num)
         #Clear the map
         clear_map()
-    else:
+    #else:
         # If this is printed than there is a problem in tb_path_publisher;
         # it is publishing element index out of range..
         #print("OUT OF RANGE")
