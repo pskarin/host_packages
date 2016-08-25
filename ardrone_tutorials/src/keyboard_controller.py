@@ -30,6 +30,8 @@ class KeyMapping(object):
 	Takeoff          = QtCore.Qt.Key.Key_Y
 	Land             = QtCore.Qt.Key.Key_H
 	Emergency        = QtCore.Qt.Key.Key_Space
+	FlatTrim         = QtCore.Qt.Key.Key_T
+	ToggleCamera     = QtCore.Qt.Key.Key_C
 
 
 # Our controller definition, note that we extend the DroneVideoDisplay class
@@ -55,6 +57,10 @@ class KeyboardController(DroneVideoDisplay):
 				controller.SendTakeoff()
 			elif key == KeyMapping.Land:
 				controller.SendLand()
+			elif key == KeyMapping.FlatTrim:
+				controller.FlatTrim()
+			elif key == KeyMapping.ToggleCamera:
+				controller.ToggleCamera()
 			else:
 				# Now we handle moving, notice that this section is the opposite (+=) of the keyrelease section
 				if key == KeyMapping.YawLeft:
