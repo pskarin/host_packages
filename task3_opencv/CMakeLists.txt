@@ -52,6 +52,10 @@ add_executable(april_tags src/april_tag_detection.cpp)
 target_link_libraries(april_tags ${catkin_LIBRARIES})
 add_dependencies(april_tags april_tags)
 
+add_executable(april_tags_turtlebot src/april_tag_detection_turtlebot.cpp)
+target_link_libraries(april_tags_turtlebot ${catkin_LIBRARIES})
+add_dependencies(april_tags_turtlebot april_tags_turtlebot)
+
 #############
 ## Install ##
 #############
@@ -65,3 +69,4 @@ install(DIRECTORY include/apriltags_ros
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES nodelet_plugins.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+

@@ -25,6 +25,9 @@ using namespace std;
 #include <sys/time.h>
 #include "wasp_custom_msgs/object_loc.h"
 
+#include <tf/transform_listener.h>
+#include <tf/transform_datatypes.h>
+
 // OpenCV library for easy access to USB camera and drawing of images
 // on screen
 #include "opencv2/opencv.hpp"
@@ -200,18 +203,41 @@ public:
     //Message to publish the APril tag ID's collected
     wasp_custom_msgs::object_loc location;
     location.ID = detection.id;
-    location.point.x = translation(0);
-    location.point.y = translation(1);
-    location.point.z = translation(2);
+
+    // the point, in the camera frame
+    tf::Vector3 point(translation(0), translation(1), translation(2));
+
+    // request the transform between the two frames
+    tf::TransformListener listener;
+    tf::StampedTransform transform;
+
+    // the time to query the server is the stamp of the incoming message
+    ros::Time time = ros::Time::now(); //todo
+
+    // frame of the incoming message
+    std::string frame = "/camera_rgb_optical_frame";
+
+    try{
+      listener.waitForTransform("/map", frame, time, ros::Duration(1.0));
+      listener.lookupTransform("/map", frame, time, transform);
+    }
+    catch (tf::TransformException ex) {
+      ROS_WARN("Map to camera transform unavailable %s", ex.what());
+    }
+
+    // the point, in the base link frame
+    tf::Vector3 point_map = transform * point;
+
+    location.point.x = point_map.x();
+    location.point.y = point_map.y();
+    location.point.z = point_map.z();
+
     object_location_pub.publish(location);
 
-    cout << "  distance=" << translation.norm()
-         << "m, x=" << translation(0)
-         << ", y=" << translation(1)
-         << ", z=" << translation(2)
-         << ", yaw=" << yaw
-         << ", pitch=" << pitch
-         << ", roll=" << roll
+    cout << "april tag id and location in map coordinates=" << location.ID
+         << ", x=" << location.point.x
+         << ", y=" << location.point.y
+         << ", z=" << location.point.z
          << endl;
 
     // Also note that for SLAM/multi-view application it is better to
@@ -282,7 +308,7 @@ int main(int argc, char* argv[]) {
 
   demo.setup();
   cout << "Initial setup executed"<<endl;
-  image_transport::Subscriber sub = it.subscribe("/ardrone/image_raw", 1, imageCallback);
+  image_transport::Subscriber sub = it.subscribe("/camera/rgb/image_rawe", 1, imageCallback);
   object_location_pub = nh.advertise<wasp_custom_msgs::object_loc>("object_location", 1);
   cout << "Image Subscriber executed"<<endl;
   ros::spin();
